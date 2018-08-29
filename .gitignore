@@ -1,0 +1,7 @@
+*~
+*.aux
+*.bbl
+*.blg
+*.pyc
+.directory
+src/__pycache__

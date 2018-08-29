@@ -1,0 +1,82 @@
+\chapter{Backpropagation derivation}
+\label{sec:appendix_backprop}
+
+The gradient of the loss $l$ with respect to the weight $w_{i,j}$ is computed by using the chain rule:
+
+\begin{equation}
+\label{eq:w_gradient}
+\frac{\partial l}{\partial w_{i,j}} = \underbrace{\frac{\partial l}{\partial o_j} \cdot \frac{\partial o_j}{\partial net_j}}_\textrm{$\delta_j$} \cdot \frac{\partial net_j}{\partial w_{i,j}}.
+\end{equation}
+
+Since the activation function $\varphi$ is differentiable,
+\begin{equation}
+\label{eq:bp_oj}
+\frac{\partial o_j}{\partial net_j} = \frac{\partial \varphi(net_j)}{\partial net_j} = \varphi\prime(net_j).
+\end{equation}
+
+By the definition of $net_j$,
+\begin{equation}
+\label{eq:bp_netj}
+\frac{\partial net_j}{\partial w_{i,j}} = \frac{\partial \sum\limits_{k}^{pred_j} w_{k,j} \cdot o_k}{\partial w_{i,j}} = o_i.
+\end{equation}
+
+The gradient of the loss $l$ with respect to the output of $h_j$ depends on whether the unit belongs to the final layer or to a hidden layer of the ANN $f$:
+
+\begin{equation}
+\label{eq:bp_l}
+\frac{\partial l}{\partial o_j} = 
+\begin{cases}
+     \frac{\partial l}{\partial f(\bm{x}_j)} & \text{if unit $h_j$ in output layer}\\ \\
+     \underbrace{\sum\limits_{k}^{succ_j} \frac{\partial l}{\partial o_k} \cdot \frac{\partial o_k}{\partial net_k}}_\textrm{total derivative wrt $o_j$} \cdot w_{j,k} = \sum\limits_{k}^{succ_j} \delta_k \cdot w_{j,k} & \text{otherwise}
+\end{cases}.
+\end{equation}
+
+Substituting equations \eqref{eq:bp_l}, \eqref{eq:bp_oj} and \eqref{eq:bp_netj} in \eqref{eq:w_gradient} we get:
+
+\begin{equation}
+\label{eq:bp_final_new}
+\frac{\partial l}{\partial w_{i,j}} = \delta_j \cdot o_i,
+\end{equation}
+
+where
+\[
+\delta_j =
+\begin{cases}
+     \frac{\partial l}{\partial f(\bm{x}_j)} \cdot \varphi\prime(net_j) & \text{if unit $h_j$ in output layer} \\ \\
+     \sum\limits_{k}^{succ_j} \delta_k \cdot w_{j,k} \cdot \varphi\prime(net_j) & \text{otherwise}
+\end{cases}.
+\]
+
+For example, suppose $\varphi$ is the standard logistic function
+
+\[
+\varphi(x) = \frac{1}{1 + e^{-x}} 
+\]
+
+with first derivative
+
+\[
+\frac{d}{dx}\varphi(x) = \varphi(x)(1 - \varphi(x))
+\]
+
+and the loss function $l$ is the Euclidean distance with first derivative
+
+\[
+\frac{d}{dx}\varphi(x) = \varphi(x)(1 - \varphi(x)).
+\]
+
+The ANN $f$ will first compute an output value $\bm{y} = f(\bm{x})$ and then update every weight according to \eqref{eq:bp_final_new} 
+
+\[
+\frac{\partial l}{\partial w_{i,j}} = \delta_j \cdot \bm{y}_i,
+\]
+
+where
+\[
+\delta_j =
+\begin{cases}
+     (\bm{y}_j - \hat{\bm{y}}_j) \cdot \bm{y}_j \cdot (1 - \bm{y}_j) & \text{if unit $h_j$ in output layer} \\ \\
+     (\sum\limits_{k}^{succ_j} \delta_k \cdot w_{j,k}) \cdot \bm{y}_j \cdot (1 - \bm{y}_j) & \text{otherwise}
+\end{cases}
+\]
+and $\hat{\bm{y}}$ is the truth value associated to $\bm{x}$ according to the training set.

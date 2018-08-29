@@ -1,0 +1,100 @@
+\chapter{Constrained adversarial networks}
+\label{ch:can}
+
+\begin{flushright}
+\rightskip=.8cm\textit{``What I cannot create, I do not understand.''} \\
+\vspace{.2em}
+\rightskip=.8cm Richard Feynman
+\end{flushright}
+\vspace{1em}
+
+
+Though there exist general frameworks that allow the encoding of various structured constraints on latent variable models \cite{slvm_pr} \cite{bayesian_pr} \cite{exp_learn}, they either are not directly applicable to ANNs or yield inferior performance \cite{harnessing}.
+Constrained adversarial networks (CANs) are a generalization of the deep generative model of BGANs, designed to introduce constraints during the adversarial training. The goal of the model is to train a generator that will be able to produce samples that simultaneously resemble those in the training set and satisfy a set of input constraints in expectation.
+
+More formally, CANs consist of a discriminator network $D(\bm{x}; \bm{\theta}^{(d)})$, a generator network $G(\bm{z}; \bm{\theta}^{(g)})$ and a set of constraints $\mathbb{C} = \{c^{(1)}, c^{(2)}, ..., c^{(m)}\}$, where each constraint $c^{(i)}: \mathbb{X} \to [0, 1]$ is a penalty function. Consistently with GANs, we define $\bm{z}$ as a random input noise drawn from a distribution $p_z$, and $p_g$ as the generator's probability distributions over data $\bm{x}$. The output of the generator $\bm{x}=G(\bm{z})$ represents a generated object resembling those of the training set and, possibly, satisfying the constraints, while the output of the discriminator $y=D(\bm{x})$ represents the probability that $\bm{x}$ was sampled from $p_{data}$ rather than $p_g$. In addition, we define a \textit{perfect} object as follows:
+
+\begin{Definition}
+    Given a set of constraints $\mathbb{C}$, an object x is perfect if $c(x) = 0$ $\forall c \in \mathbb{C}$.
+\end{Definition}
+
+
+\section{Theoretical motivations}
+
+The design of CANs is guided by some theoretical motivations regarding common issues arising when dealing with domains subject to constraints. One of them is that formally encoding constraints may sometimes be hard. This problem is especially true when constraints involve global properties of objects that we, as human, recognize intuitively or can not formally describe. In particular, a constraint can be hard to encode either from a \textit{practical} point of view or from a \textit{conceptual} one. For instance, suppose our data set is made up of images of human faces. A constraint that is practically hard to encode may involve the expected number of eyes on each image. Expressing such property in term of image pixels is clearly unfeasible. However, it is very simple for us to describe what high-level image characteristics we expect to consider the constraint satisfied and, even simpler, to determine if the constraint is not satisfied from a quick glance. On the contrary, it is conceptually harder for us to express the property of beauty. This is not something related to personal taste, rather to the global and somehow implicit nature of some image properties. Nevertheless, we expect a generative model to produce beautiful faces if its training set only consist of pictures of beautiful faces.
+
+GANs are not affected by this problem because, when provided with enough capacity, they can automatically learn how to generate images resembling input data. So, if training set objects satisfy these high-level constraints, the generator will be forced to learn them in order to deceive the discriminator. As a final result, images sampled from $p_g$ will tend to have these desired properties even if they were not explicitly encoded anywhere. CANs inherit this capability from GANs. In addition, they provide the possibility to directly encode all the other constraints that can be easily expressed to instil external knowledge in the network and to guide the generator training process via penalty functions.
+
+Finding solutions to constrained problem such as CSPs and COPs can be computationally hard. For instance, it is known that SAT is a decision problem NP-complete. The novel approach of CANs consists in replacing the explicit constraints optimization with an implicit polynomial-time learning procedure. During training, in particular, penalty function are evaluated by one of the two networks and their output values are used to guide the generator in better approximating with its probability distribution $p_g$ the goal distribution $p_{data}$. Exploring different solutions to make this idea effective and efficient has been the research goal.  Furthermore, once the networks are trained, generating a possibly perfect object only requires one forward passing of noise through the generator, so it can be done in polynomial-time as well. Also this property of the model is inherited by GANs.
+
+Finally, in some situations finding a single solution is not sufficient for the task being performed and one may be interested in different candidates among those available, perhaps with some kind of statistical guarantee. Many methods are not designed to satisfy this requirement and obtaining different solutions may be particularly inefficient or even impossible. A generative model parametric on some input noise overcomes this limitation by its very nature. In fact, once trained, CANs can be efficiently used for sampling many instances from $p_g$ by simply using different input noise vectors $\bm{z}$. The more effective the ANNs training procedure is, the higher will be the number of perfect examples produced by the generator. However, the most important consideration involves execution times, since generating a possibly perfect object always requires polynomial time. This allows, for instance, efficient \textit{rejection sampling}, since CANs can be used to produce in polynomial time examples that, in expectation, will not be rejected, making this model useful for many other applications, such as approximate inference or recommendation. 
+
+
+\section{Design choices}
+
+Introducing constraints in the game theoretic scenario of GANs can be done in many different ways. This section describes some of the approaches that have been explored, postponing the presentation of the results and their analysis to chapter \ref{ch:experiments_and_results}.
+
+\subsection{Adversarial models}
+
+Since the adversarial training procedure involves two different networks, the first necessary design choice behind CANs regards the \textit{location} in which information coming from penalty functions should be used.
+
+It would seem obvious to add constraints directly in the generator, since they can provide useful clues on how new objects shall be. In this case the generator loss function will include a signal on constraints satisfaction. The loss function to minimize of this new constraint-regularized generator may thus be
+\[
+l_G = \mathbb{E}_{\bm{z} \sim p_z} [\log (1 - D(G(\bm{z})))] + \lambda \mathbb{E}_{\bm{z} \sim p_z} [\sum\limits_{i=1}^{|\mathbb{C}|}c^{(i)}(G(\bm{z}))],
+\]
+
+where $\lambda$ is a regularization term.
+
+This approach can be effective, but requires each constraint in $\mathbb{C}$ to be differentiable in order to backpropagate the learning signal throughout all the generator. Exploring this direction is left for future works.
+    
+The opposite approach is to introduce constraints in the discriminator network. Providing $D$ with some oracle penalty functions should enhance its capability to distinguish between training and sampled data. This is especially true when the training set only contains perfect objects. As long as the adversarial training is well-balanced, the generator will be indirectly forced to produce objects satisfying the constraints, especially during the first epochs. From a high-level point of view, this corresponds to strengthen the predictive capability of the discriminator that will, in turn, push the generator to produce better objects in order to effectively compete in the game. The objective function to maximize of this new constraint-regularized discriminator may thus be
+\[
+l_D = \mathbb{E}_{\bm{x} \sim p_{data}} [\log D(\bm{x}, \bm{c}(\bm{x}))] + \mathbb{E}_{\bm{z} \sim p_z} [\log (1 - D(G(\bm{z}), \bm{c}(G(\bm{z}))))] 
+\]
+
+This solution is conceptually reasonable and practically flexible. Furthermore, it is constraint-agnostic and can be used even with constraints that are not differentiable. For these reasons, it has been extensively tested.
+
+Another approach is to extend the GANs model to introduce a third network, a \textit{teacher}, forcing the generator to emulate its rule-regularized predictions \cite{harnessing}. This iterative rule distillation process can effectively transfer rich structured knowledge, expressed in the declarative first-order logic language, into parameters of general neural network. Furthermore, this process is agnostic about the ANNs architectures and is left for future works as well.
+
+
+\subsection{Discriminator architectures}
+
+The second main design choice behind CANs involves the \textit{positioning} of constraints-related hidden units.
+
+Regardless of the internal details about the discriminator architecture, the output layer will necessarily contains one single unit determining the final prediction on the input example. This characteristic enables a straightforward extension that is agnostic about the inner layers and thus applicable to any discriminator network. In this first approach, the original prediction $y = D(\bm{x})$ is linearly combined with a \textit{penalty vector} $\bm{c} = [c^{(1)}(\bm{x}), c^{(2)}(\bm{x}), ..., c^{(m)}(\bm{x})]$ and the final result $y'$ is given by a new output layer with a single unit receiving in input
+\[
+\alpha_0y + \sum\limits_{i=1}^m \alpha_i\bm{c}_i,
+\]
+where $\alpha_i$ are trainable weights balancing the importance of resembling input data and satisfying constraints. Since the output of the discriminator $y'=D(\bm{x})$ represents the probability that $\bm{x}$ came from $p_{data}$  rather than $p_g$ and constraints are evaluated via penalty functions assigning greater values to imperfect object, such as those produced by $p_g$, CANs should automatically learn to assign negative values to all the weights $\alpha_i$. By doing so, the more an input object violates the constraints, the easier it will be predicted as sampled. Perfect objects from training set will incur in no penalization during all the training procedure, regardless of the current values of $\alpha_i$, since their penalty vectors will always contain only $0$ values. In addition, CANs are given the possibility to learn which constraints are more useful during training since they can assign different scores to the multipliers $\alpha_i$.
+
+A similar approach consists in using the same penalty vector in an inner layer, before the final output of the discriminator is computed. Of course, such approach is no more agnostic about the inner architecture of the ANN, thus possibly making CANs no more generally applicable around any black-box network $D$. However, in practice, the requirements to apply this method are easily met since it is reasonable to believe that any network $D$ will have a final hidden layer with some dozens of hidden units. More formally, given a discriminator $D(\bm{x}) = f^{(n)}(f^{(n-1)}(...(f^{(2)}(f^{(1)}(\bm{x})))))$ composed of $n$ layers, the final result $y'$ is given by the same output layer $f^{(n)}$ receiving in input
+\[
+f^{(n-1)}(\sum\limits_{i=1}^u \beta_u \bm{h}_u + \sum\limits_{i=1}^m \alpha_i\bm{c}_i),
+\]
+
+where $u$ is the number of hidden units of the last inner layer and $\bm{h} = f^{(n-2)}(...(f^{(2)}(f^{(1)}(\bm{x}))))$ is the the output of the previous hidden layer. The rationale behind this design trick is to slightly increase the impact of penalty vectors, exploiting them before the final decision is computed by the discriminator. Overall, the new discriminator has higher capacity than the one of the first approach and it is the one tested.
+
+
+\subsection{Constraints timing}
+\label{subsec:constraints_timing}
+
+The last important design choice for CANs regards \textit{time intervals} in which hints from penalty functions should be actively used to train the model. The following considerations hold regardless of other design choices, such as those involving alterations of the training procedure or the ANNs architectures. Furthermore, they can be crucial for the final performance and efficiency of the model. This is especially true when evaluating penalty functions has a remarkable impact on execution times.
+
+Many modern deep learning models are parametric on some conditions in order to dynamically change the function computed by the ANN in response to some events. For instance, some layers could be added, others could be dropped or some weights could be frozen for a certain period of time. This flexibility opens up a wide spectrum of possibilities.
+
+The two time-related critical issues for CANs lie in the moment in which constraints should be introduced and in the duration for which they should be used. The number of combinations of the possibilities can be large: only some of them are now discussed.
+
+First of all, constraints can be introduced since the beginning of the adversarial training to immediately provide the discriminator with a powerful tool to distinguish real data from sampled ones. In this case the generator will be soon forced to satisfy constraints, perhaps at the cost of ignoring other implicit global properties.
+
+One alternative is to introduce penalty functions only after a certain number of epochs has passed. By doing so, the generator will first learn how to produce plausible objects and then, hopefully, it will refine its knowledge to also satisfy constraints. The number of epochs after which constraints should be introduced can be decided in advanced or it can be dynamically determined during training, for instance as a function of the current performance of the model on the validation set.
+
+The orthogonal decision is for how long penalty functions should be computed once constraints have been introduced in the learning procedure. For example, once enabled, they could be kept active until the training stopping criterion is reached and learning is stopped, or they could be repeatedly switched on and off. These questions are investigated in the experimental stage.
+
+
+\subsection{Secondary issues}
+
+Besides the aforementioned design choices, there are some others that are still worth describing, even if their impact on the performance is probably negligible.
+
+A minor design choice regards the initialization of the ANN weights of the penalty vector $\bm{c}$, that are expected to become negative and progressively smaller as training proceeds. This prior knowledge may be used to set a negative initial values to all the weights, rather than random ones, relieving the discriminator of the burden of understanding that penalty functions can be used to effectively distinguish real and sampled data. This kind of initialization is methodologically fair since it can be considered another form of rule-based knowledge instillation technique of CANs. However, finding the optimal initial values may be non-trivial and it is practically more convenient to let $D$ learn them automatically.
+
+Finally, rather than using penalty functions, CANs could involve some kind of \textit{reward functions}. For instance, the set of constraints $\mathbb{C} = \{c^{(1)}, c^{(2)}, ..., c^{(m)}\}$ could be modified in $\mathbb{C'} = \{1 - c^{(1)}, 1 - c^{(2)}, ..., 1 - c^{(m)}\}$. In this case, the penalty vector $\bm{c}$ becomes a reward vector and $D$ is expected to learn positive weights for it. From a high-level point of view, this corresponds to increase the probability of considering an object as real if it satisfies the constraints. The two versions seems mathematically equivalent and some preliminary experiments have shown that this modification does not have any notable effect on the final result. For such reason, all the presented experiments only use set of penalty functions.

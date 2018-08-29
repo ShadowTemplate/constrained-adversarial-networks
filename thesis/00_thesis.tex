@@ -1,0 +1,76 @@
+\documentclass[a4paper,11pt,titlepage,oneside,openright]{book}
+\usepackage{epsfig} % use eps images
+\usepackage{plain} % page numbers always bottom-centered
+\usepackage{setspace} % line spacing
+\usepackage[paperheight=29.7cm,paperwidth=21cm,outer=1.5cm,inner=2.5cm,top=2cm,bottom=2cm]{geometry} % page layout
+\usepackage{titlesec} % custom chapter titles
+\usepackage{tocloft} % table of contents with dots
+\usepackage{amssymb} % R symbol
+\usepackage{amsthm} % theorems
+\usepackage{amsmath} % piece-wise function
+\usepackage{algorithm} % algorithm
+\usepackage[noend]{algpseudocode} % algorithm pseudocode
+\usepackage{bm} % bold in formulae
+\usepackage{mathabx} % math symbols
+\usepackage[utf8x]{inputenc} % special characters support
+\usepackage[english]{babel} % english ty­po­graph­i­cal rules, hy­phen­ation, etc
+\usepackage[linktocpage=true]{hyperref} % links in TOC
+\usepackage{graphicx} % images
+\usepackage{subcaption} % images
+\usepackage{tabularx} % tables
+\usepackage{color}
+
+\renewcommand{\cftchapleader}{\cftdotfill{\cftdotsep}} % TOC dots for chapters
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}} % TOC dots for sections
+
+\newcommand{\todo}[3]{\textcolor{#1}{#2 [{\bf #3}]}}
+\newcommand{\todor}[2]{\todo{red}{#1}{#2}}
+\newcommand{\todog}[2]{\todo{blue}{#1}{#2}}
+
+\graphicspath{ {./figures/} {../src/out/plots/} }
+
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Definition}{Definition}
+\newtheorem{Problem}{Problem}
+
+\input{01_bengio_math_commands}
+
+\begin{document}
+    \singlespacing
+    \pagenumbering{gobble} % no page numbering
+    \input{02_frontispiece}
+    \clearpage
+    
+    \pagestyle{plain}
+    \mainmatter % Arabic page numbering
+
+    \tableofcontents
+    \clearpage
+    \input{03_acronyms}
+%     \input{04_bengio_notation}
+    
+    \input{05_abstract}
+
+    \input{06_chapter1}
+    \input{07_chapter2}
+    \input{08_chapter3}
+    \input{09_chapter4}
+    \input{10_chapter5}
+
+%     \input{11_acknowledgements}
+    
+    \addcontentsline{toc}{chapter}{Bibliography} % add bibliography to TOC
+    \bibliographystyle{plain} % sort by author name
+    \bibliography{12_bibliography}
+    
+    \appendix
+    \input{13_appendix_a}
+    \input{14_appendix_b}
+
+\end{document}
+
+
+% TODO
+% - prune useless notation
+% - full text in Eng
+% - Acknow

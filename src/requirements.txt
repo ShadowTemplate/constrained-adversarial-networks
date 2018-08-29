@@ -1,0 +1,8 @@
+numba==0.36.2
+tensorflow==1.5.0
+xxhash==1.0.1
+dill==0.2.7.1
+numpy==1.14.0
+scipy==0.19.0
+fuel==0.2.0
+Pillow==5.0.0

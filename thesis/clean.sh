@@ -1,0 +1,10 @@
+rm 00_thesis.lof
+rm 00_thesis.aux
+rm 00_thesis.synctex.gz
+rm 00_thesis.bbl
+rm 00_thesis.blg
+rm 00_thesis.toc
+rm 00_thesis.out
+rm 00_thesis.abbr
+rm 00_thesis.log
+rm 00_thesis.pdf

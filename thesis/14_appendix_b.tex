@@ -1,0 +1,55 @@
+\chapter{Gradient derivation for BGANs}
+\label{sec:appendix_bgans}
+
+The goal of BGANs is to train a generator outputting discrete values by estimating gradients for $\bm{\theta}^{(g)}$ via the exclusive Kullback-Leibler divergence between the two joint distributions $\widetilde{p}_{data}(\bm{x}, \bm{z})$ and $p_g(\bm{x}, \bm{z})$:
+
+\begin{equation}
+\nabla_{\bm{\theta}^{(g)}} D_{KL}(\widetilde{p}_{data}(\bm{x}, \bm{z}) || p_g(\bm{x}, \bm{z})).
+\end{equation}
+
+$\widetilde{p}_{data}(\bm{x}, \bm{z})$ can be assumed to be constant with respect to $\bm{\theta}^{(g)}$ if the one from the previous iteration is used. Thus, $\bm{\theta}^{(g)}$ gradient will not be propagate inside $\widetilde{p}_{data}(\bm{x}, \bm{z})$. Due to \eqref{eq:p_data_estimator} and \eqref{eq:cond_prob_g}, the following holds:
+
+\begin{equation}
+\label{eq:joint_estimator}
+\widetilde{p}_{data}(\bm{x}, \bm{z}) = \widetilde{p}_{data}(\bm{x}|\bm{z})p(\bm{z}) = \frac{1}{Z_{|\bm{z}}} g(\bm{x}|\bm{z}) \frac{D(\bm{x})}{1-D(\bm{x})} p(\bm{z}),
+\end{equation}
+
+where
+
+\[
+Z_{|\bm{z}} = \sum_{\bm{x}} g(\bm{x}|\bm{z}) \frac{D(\bm{x})}{1-D(\bm{x})}
+\]
+
+and $\widetilde{p}_{data}(\bm{x}|\bm{z})p(\bm{z})$ is an estimate of the data in the neighborhood of the generated samples defined by $\bm{z}$.
+
+The gradient can be estimated as follows:
+
+\begin{align*}
+\nabla_{\bm{\theta}^{(g)}} D_{KL}(\widetilde{p}_{data}(\bm{x},\bm{z}) || p_g(\bm{x},\bm{z}))) & = \nabla_{\bm{\theta}^{(g)}} \sum_{\bm{z}} \sum_{\bm{x}} \widetilde{p}_{data}(\bm{x},\bm{z}) \log{\frac{\widetilde{p}_{data}(\bm{x},\bm{z})}{p_g(\bm{x},\bm{z})}} \\
+& = \nabla_{\bm{\theta}^{(g)}} \sum_{\bm{z}} \sum_{\bm{x}} \widetilde{p}_{data}(\bm{x},\bm{z}) (\log{\widetilde{p}_{data}(\bm{x},\bm{z}) - \log p_g(\bm{x},\bm{z})}) \\
+& = - \sum_{\bm{z}} \sum_{\bm{x}} \widetilde{p}_{data}(\bm{x},\bm{z}) \nabla_{\bm{\theta}^{(g)}} \log p_g(\bm{x},\bm{z}) \\
+& \stackrel{\eqref{eq:joint_estimator}}{=} - \sum_{\bm{z}} \sum_{\bm{x}} \frac{1}{Z_{|\bm{z}}}g(\bm{x}|\bm{z})\frac{D(\bm{x})}{1-D(\bm{x})}p(\bm{z}) \nabla_{\bm{\theta}^{(g)}} \log p_g(\bm{x},\bm{z}) \\
+& = - \mathbb{E}_{\bm{z} \sim p(\bm{z})} \left[\sum_{\bm{x}} \frac{1}{Z_{|\bm{z}}}\frac{D(\bm{x})}{1-D(\bm{x})}g(\bm{x}|\bm{z}) \nabla_{\bm{\theta}^{(g)}}\log{g(\bm{x}|\bm{z})}\right]\\
+& \approx - \mathbb{E}_{\bm{z} \sim p(\bm{z})} \left[\sum\limits_{m = 1}^{M} \frac{1}{M}\frac{1}{Z_{|\bm{z}}}\frac{D(\bm{x}^{(m)})}{1-D(\bm{x}^{(m)})}\nabla_{\bm{\theta}^{(g)}}\log{g(\bm{x}^{(m)}|\bm{z})}\right]
+\end{align*}
+
+where we approximated the gradient using $M$ samples
+$\bm{x}^{(m)} \sim g(\bm{x}|\bm{z})$ for each $\bm{z}$. Selecting $\bm{x}^{(m)}$ amounts at sampling the discrete values from the probability $g(\bm{x}|\bm{z})$, e.g. a sigmoid function for binary variables.
+
+The samples can also be used to approximate $Z_{|\bm{z}}$ as:
+$$
+Z_{|\bm{z}} = \sum_{\bm{x}} g(\bm{x}|\bm{z}) \frac{D(\bm{x})}{1-D(\bm{x})} \approx \sum\limits_{m = 1}^{M} \frac{1}{M}\frac{D(\bm{x}^{(m)})}{1-D(\bm{x}^{(m)})}.
+$$
+
+For binary variables it is possible to approximate $\nabla_{\bm{\theta}^{(g)}} \log{g(\bm{x}^{(m)}|\bm{z})}$ in the case of a logistic activation function $\sigma$ as follows:
+
+\begin{align*}
+\nabla_{\bm{\theta}^{(g)}} \log{g(\bm{x}^{(m)}|\bm{z})}
+& = \nabla_{\bm{\theta}^{(g)}} \sum_{i=1}^{|\bm{x}^{(m)}|} \bm{1}_{[\bm{x}_i^{(m)} = 1]} \log{g_i(\bm{x}^{(m)}|\bm{z})} + \bm{1}_{[\bm{x}_i^{(m)} = 0]} \log{(1 - g_i(\bm{x}^{(m)}|\bm{z}))}  \\
+& = \nabla_{\bm{\theta}^{(g)}} \sum_{i=1}^{|\bm{x}^{(m)}|} \bm{1}_{[\bm{x}_i^{(m)} = 1]} \log{\sigma(h_i(\bm{x}^{(m)}|\bm{z}))} + \bm{1}_{[\bm{x}_i^{(m)} = 0]} \log{(1 - \sigma(h_i(\bm{x}^{(m)}|\bm{z})))} \\
+& =  \nabla_{\bm{\theta}^{(g)}} \sum_{i=1}^{|\bm{x}^{(m)}|} \bm{1}_{[\bm{x}_i^{(m)} = 1]} \log{\frac{1}{1+e^{-h_i(\bm{x}^{(m)}|\bm{z})}}}+ \bm{1}_{[\bm{x}_i^{(m)} = 0]} \log{\frac{e^{-h_i(\bm{x}^{(m)}|\bm{z})}}{1+e^{-h_i(\bm{x}^{(m)}|\bm{z})}}} \\                                
+& =  - \nabla_{\bm{\theta}^{(g)}} \sum_{i=1}^{|\bm{x}^{(m)}|}\log{(1+e^{-h_i(\bm{x}^{(m)}|\bm{z})})} + \bm{1}_{[\bm{x}_i^{(m)} = 0]}h_i(\bm{x}^{(m)}|\bm{z}) \\
+& \approx  - \nabla_{\bm{\theta}^{(g)}} \sum_{i=1}^{|\bm{x}^{(m)}|}\max{(0,-h_i(\bm{x}^{(m)}|\bm{z}))} + \bm{1}_{[\bm{x}_i^{(m)} = 0]}h_i(\bm{x}^{(m)}|\bm{z}),
+\end{align*}
+
+since $\log{(1+e^{-\bm{x}})} \approx \max{(0,-\bm{x})}$.

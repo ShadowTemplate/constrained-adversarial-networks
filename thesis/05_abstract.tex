@@ -1,0 +1,17 @@
+\chapter*{Abstract} % no numbering
+
+\addcontentsline{toc}{chapter}{Abstract} % add Abstract to TOC
+
+Many real-world applications involve domains subject to a set of constraints, such as syntactic rules in natural language processing and physics laws in probabilistic robotics. Reasoning in these constrained domains can be challenging. For instance, solving constrained problems can be computationally expensive, and some decision problems, such as propositional satisfiability, are known to be NP-complete.
+
+The goal of this work is to propose a novel approach to deal with constraints in the context of generative models involving artificial neural networks. In particular, it aims at finding effective ways to instil prior knowledge in the form of constraints in the game theoretic scenario of generative adversarial networks. This task is not much investigated in literature and, due to its potential implications, deserves further research.
+
+In the original adversarial model, two networks, a discriminator and a generator, compete against each other in a minimax game. The goal of the generator is to produce objects similar to the training examples and trick the discriminator into believing they are real, while the goal of the discriminator is to minimize the chances of this to happen. If the game is well-balanced, the generator will learn how to produce new objects resembling those in input, enabling a wide range of applications.
+
+The proposed model of constrained adversarial networks enables the encoding of useful prior knowledge in this framework by introducing a set of penalty functions in the training algorithm. The final result is that the new generator is able to produce samples that simultaneously resemble those in the training set and satisfy input constraints in expectation.
+
+The conducted experiments reveal how the novel architecture is able to approximate the data distribution more closely than its constraints-unaware counterpart, with a performance gap that seems to increase proportionally with the amount of information conveyed by constraints. Furthermore, by exploring different design choices and analysing several other factors, this work offers a number of insights on how these may individually impact on the final performance.
+
+Constrained adversarial networks provide a flexible model to learn how to produce objects satisfying in expectation both constraints that can be formally expressed and constraints that are hard to encode, either from a practical point of view (e.g. in terms of image pixels) or from a conceptual one (e.g. formalize the idea of \textit{beauty}). This result is achieved by evaluating penalty functions and by looking at examples in the same learning algorithm and in a fully-differentiable setting.
+
+Besides the obvious task of object generation, the architecture can be useful for multiple purposes in different constrained contexts, such as for efficient rejection sampling. Our preliminary results on synthetic data sets are encouraging, justifying further research.
