@@ -53,8 +53,8 @@ Each experiment JSON is made up of three parts:
 experiment. If it is missing, it will be created according to the defined 
 characteristics.
 2. ANN parameters. Here one can specify the discriminator and generator 
-architectures, as well as other hyperparameters, such as learning rate, epochs 
-number and so on.
+architectures, as well as other hyperparameters, such as learning rate and 
+epochs number.
 3. Constraints. Optional user-defined functions to be used while training the 
 model.
 
@@ -79,10 +79,12 @@ experiment can be used to train and test a BGANs model. It defines:
 
 A data set of 23,040 squared black-and-white images (18,944 training, 4,096 
 test) of 20x20 pixels each. Each image contains two random polygons with 
-specific probabilities (30% triangles, 30% squares, 40% rhombi) in random valid 
+given probabilities (30% triangles, 30% squares, 40% rhombi) in random valid 
 positions, each one with a white area of 25 pixels. The seed 42 is used for 
 repeatable data set generation. The output data set will be generated in 
 `src\out\datasets`.
+
+![poly20_zoom.png](poly20_zoom.png)
 
 Further details on this data set can be found in the [thesis](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/thesis/00_thesis.pdf) 
 (§ 4.1).
@@ -142,18 +144,21 @@ Three penalty functions (`_greater_area_inner`, `_smaller_area_inner`,
 will not be used, since the `CONSTRAINED_TRAINING` flag is false. 
 `CONSTRAINTS_FN_SINGLE_BATCH` and `CONSTRAINTS_FN_MULTI_BATCH` are the two 
 functions that combine the values computed by the penalty scores, both for a 
-single batch and for a group of batches (for computational efficiency).
+single batch and for a group of batches (for computational efficiency). Even if
+this constraints-related part is useless, it is kept for consistency with CANs.
 
 On the contrary, an example for CANs can be seen in the 
 [can_pc_S0.json](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/in/experiments/can_pc_S0.json) 
-experiment. The data set is equivalent to previous one, but for the usage of 
-
+experiment. The data set is equivalent to the previous one, but for the usage 
+of 
 
 ```
 "SUFFIX_ID": "_pc",
 ```
 
 to differentiate between the two.
+
+![poly20_pc_zoom.png](poly20_pc_zoom.png)
 
 Networks and hyperparameters definitions are almost identical. In order to 
 consider constraints, new hidden units are added to the discriminator, that is 
@@ -198,6 +203,8 @@ learning since the starting epoch.
   "CONSTRAINTS_FROM_EPOCH": 0
 ```
 
+![pc_zoom.png](pc_zoom.png)
+
 
 ### Prerequisites
 
@@ -209,29 +216,23 @@ $ cd constrained-adversarial-networks/src/
 $ pip install --user -r requirements.txt
 ```
 
-### Installing
-
-Notes about how to install the project.
-
-```
-command
-```
-
 ### Testing
 
-Notes about how to run tests.
+
 
 ```
-command
+$ 
+$ 
+$ 
 ```
 
-### Deployment
+Samples drawn at different epochs from the BGANs generator:
 
-Notes about how to deploy the project on a live system.
+![training](file:///home/gianvito/Desktop/constrained-adversarial-networks/training.gif)
 
-```
-command
-```
+Samples drawn at different epochs from the CANs generator:
+
+![training_pc](file:///home/gianvito/Desktop/constrained-adversarial-networks/training_pc.gif)
 
 ---
 ## Building tools
