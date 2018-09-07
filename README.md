@@ -49,13 +49,13 @@ be able to design new experiments by looking at the one already present.
 
 Each experiment JSON is made up of three parts:
 
-1. Data set. Here one can specify which data set should be used for the 
+1. **Data set**. Here one can specify which data set should be used for the 
 experiment. If it is missing, it will be created according to the defined 
 characteristics.
-2. ANN parameters. Here one can specify the discriminator and generator 
+2. **ANN parameters**. Here one can specify the discriminator and generator 
 architectures, as well as other hyperparameters, such as learning rate and 
 epochs number.
-3. Constraints. Optional user-defined functions to be used while training the 
+3. **Constraints**. Optional user-defined functions to be used while training the 
 model.
 
 For example, the [bgan_S0.json](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/in/experiments/bgan_S0.json) 
@@ -228,11 +228,11 @@ $
 
 Samples drawn at different epochs from the BGANs generator:
 
-![training](file:///home/gianvito/Desktop/constrained-adversarial-networks/training.gif)
+![training](training.gif)
 
 Samples drawn at different epochs from the CANs generator:
 
-![training_pc](file:///home/gianvito/Desktop/constrained-adversarial-networks/training_pc.gif)
+![training_pc](training_pc.gif)
 
 ---
 ## Building tools
