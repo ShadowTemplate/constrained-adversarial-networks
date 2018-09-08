@@ -20,7 +20,7 @@ from utils import first_arg_null_safe
 class BinomialTrainer:
     def __init__(self, experiment, tf_session_config, training_data, test_data,
                  validation_data):
-        # keep calm and take a deep breath: there a LOT of things to define
+        # keep calm and take a deep breath: there are a LOT of things to define
         # and initialize before running the training algorithm...
 
         self.logger = experiment.logger
