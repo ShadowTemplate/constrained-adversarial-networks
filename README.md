@@ -84,9 +84,9 @@ positions, each one with a white area of 25 pixels. The seed 42 is used for
 repeatable data set generation. The output data set will be generated in 
 `src/out/datasets`.
 
-![poly20_zoom.png](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/readme/poly20_zoom.png)
+![poly20_zoom.png](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/readme/poly20_zoom.png)
 
-Further details on this data set can be found in the [thesis](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/thesis/00_thesis.pdf) 
+Further details on this data set can be found in the [thesis](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/thesis/00_thesis.pdf) 
 (§ 4.1).
 
 2. ANN parameters:
@@ -114,10 +114,10 @@ Further details on this data set can be found in the [thesis](https://github.com
 ```
 
 The generator network will be the one defined by the function `_gan20_gen` in 
-[architectures.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/architectures.py) and will be trained with the loss function `_bgan_gen_loss` 
-in [losses.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/losses.py). Similarly, the discriminator network will be the one defined 
-by the function `_gan20_discr_32layer` in [architectures.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/architectures.py) and will be 
-trained with the loss function `_bgan_discr_loss` in [losses.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/losses.py). The 
+[architectures.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/architectures.py) and will be trained with the loss function `_bgan_gen_loss` 
+in [losses.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/losses.py). Similarly, the discriminator network will be the one defined 
+by the function `_gan20_discr_32layer` in [architectures.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/architectures.py) and will be 
+trained with the loss function `_bgan_discr_loss` in [losses.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/losses.py). The 
 networks will be trained for 250 epochs, with a mini-batch size of 64 and 
 estimates from 20 samples (further details on samples number can be found in 
 the original paper on BGANs). Generator and discriminator will be trained with
@@ -140,7 +140,7 @@ used while comparing different experiments.
 ```
 
 Three penalty functions (`_greater_area_inner`, `_smaller_area_inner`, 
-`_convex`) are defined in the JSON and can be found in [constraints.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/constraints.py), but 
+`_convex`) are defined in the JSON and can be found in [constraints.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/constraints.py), but 
 will not be used, since the `CONSTRAINED_TRAINING` flag is false. 
 `CONSTRAINTS_FN_SINGLE_BATCH` and `CONSTRAINTS_FN_MULTI_BATCH` are the two 
 functions that combine the values computed by the penalty scores, both for a 
@@ -148,7 +148,7 @@ single batch and for a group of batches (for computational efficiency). Even if
 this constraints-related part is useless, it is kept for consistency with CANs.
 
 On the contrary, an example for CANs can be seen in the 
-[can_pc_S0.json](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/in/experiments/can_pc_S0.json) 
+[can_pc_S0.json](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/in/experiments/can_pc_S0.json) 
 experiment. The data set is equivalent to the previous one, but for the usage 
 of 
 
@@ -168,7 +168,7 @@ now built with `_can20_discr_32layer_auto`:
 "DISCRIMINATOR": "_can20_discr_32layer_auto",
 ```
 
-Further details on the architecture can be found in the [thesis](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/thesis/00_thesis.pdf) 
+Further details on the architecture can be found in the [thesis](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/thesis/00_thesis.pdf) 
 (§ 4.4).
 
 Finally, a set of constraints is defined and they are introduced during 
@@ -226,7 +226,7 @@ $ python can.py -i src/in/experiments/can_pc_S0.json
 
 You will notice that the compressed data set is already provided in the 
 `src/out/datasets` folder, so there is no need to run 
-[polygons_generator.py](https://github.com/ShadowTemplate/constrained-adversarial-network/blob/master/src/polygons_generator.py).
+[polygons_generator.py](https://github.com/ShadowTemplate/constrained-adversarial-networks/blob/master/src/polygons_generator.py).
 
 As soon as the training is started the data set will be extracted in 
 `src/out/datasets/23k_20x20_pol(0.3,_0.3,_0.4)_area25_S42_pc/` and it will also
